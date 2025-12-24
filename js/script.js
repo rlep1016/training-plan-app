@@ -63,36 +63,42 @@ const defaultTrainData = {
 const API_BASE_URL = '/api/training-data';
 
 // 从 Cloudflare Pages Functions 获取数据，失败则回退到本地存储
-async function getTrainData() {
-    try {
-        const response = await fetch(API_BASE_URL);
-        if (response.ok) {
-            const data = await response.json();
-            // 如果有数据，更新本地存储
-            if (data && Object.keys(data).length > 0) {
-                localStorage.setItem("trainData", JSON.stringify(data));
-                return data;
+// 获取训练数据，支持强制刷新
+async function getTrainData(forceRefresh = false) {
+    // 如果强制刷新或本地存储为空，尝试从云端获取
+    if (forceRefresh || !localStorage.getItem("trainData")) {
+        try {
+            const response = await fetch(API_BASE_URL, {
+                cache: 'no-store' // 禁用缓存，确保获取最新数据
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                // 如果有数据，更新本地存储
+                if (data && Object.keys(data).length > 0) {
+                    localStorage.setItem("trainData", JSON.stringify(data));
+                    console.log('从云端获取数据成功');
+                    return data;
+                }
+            } else {
+                const errorText = await response.text();
+                console.error('从云端获取数据失败:', errorText);
             }
+        } catch (error) {
+            console.error('网络请求失败，使用本地存储:', error);
         }
-    } catch (error) {
-        console.log('从Pages Functions获取数据失败，使用本地存储:', error);
     }
     
     // 回退到本地存储
     const storedData = localStorage.getItem("trainData");
     const data = storedData ? JSON.parse(storedData) : JSON.parse(JSON.stringify(defaultTrainData));
     
-    // 初始化KV数据
-    await saveTrainData(data);
     return data;
 }
 
 // 保存数据到 Cloudflare Pages Functions 和本地存储
 async function saveTrainData(data) {
-    // 更新本地存储
-    localStorage.setItem("trainData", JSON.stringify(data));
-    
-    // 尝试更新KV存储
+    // 首先尝试更新云端数据
     try {
         const response = await fetch(API_BASE_URL, {
             method: 'PUT',
@@ -101,11 +107,22 @@ async function saveTrainData(data) {
             },
             body: JSON.stringify(data)
         });
-        if (!response.ok) {
-            console.error('保存数据到KV失败:', await response.text());
+        
+        if (response.ok) {
+            // 如果云端更新成功，再更新本地存储
+            localStorage.setItem("trainData", JSON.stringify(data));
+            console.log('数据已成功保存到云端和本地');
+        } else {
+            const errorText = await response.text();
+            console.error('保存数据到云端失败:', errorText);
+            // 即使云端失败，也更新本地存储，确保用户体验
+            localStorage.setItem("trainData", JSON.stringify(data));
+            console.log('数据仅保存到本地');
         }
     } catch (error) {
         console.error('网络请求失败，数据仅保存到本地:', error);
+        // 网络失败时，仍然更新本地存储
+        localStorage.setItem("trainData", JSON.stringify(data));
     }
 }
 
@@ -167,8 +184,8 @@ function renderAction(action, tab, stage) {
 }
 
 // 渲染指定标签页的指定阶段
-async function renderStage(tab, stage) {
-    const trainData = await getTrainData();
+async function renderStage(tab, stage, forceRefresh = false) {
+    const trainData = await getTrainData(forceRefresh);
     const container = document.getElementById(`${tab}-${stage}`);
     container.innerHTML = "";
 
@@ -179,22 +196,27 @@ async function renderStage(tab, stage) {
 }
 
 // 渲染整个标签页
-async function renderTab(tab) {
-    await renderStage(tab, "warmup");
-    await renderStage(tab, "formal");
-    await renderStage(tab, "relax");
+async function renderTab(tab, forceRefresh = false) {
+    await renderStage(tab, "warmup", forceRefresh);
+    await renderStage(tab, "formal", forceRefresh);
+    await renderStage(tab, "relax", forceRefresh);
 }
 
 // 删除动作
 async function deleteAction(id, tab, stage) {
     if (confirm("确定要删除这个动作吗？")) {
+        // 获取当前数据
         const trainData = await getTrainData();
         const actions = trainData[tab][stage];
         const index = actions.findIndex(item => item.id === id);
+        
         if (index !== -1) {
+            // 删除动作
             actions.splice(index, 1);
+            // 保存到云端和本地
             await saveTrainData(trainData);
-            await renderStage(tab, stage);
+            // 重新渲染时强制从云端获取最新数据
+            await renderStage(tab, stage, true);
         }
     }
 }
@@ -224,6 +246,7 @@ function closeEditModal() {
 // 保存编辑内容
 async function saveEditForm(e) {
     e.preventDefault();
+    // 获取当前数据
     const trainData = await getTrainData();
 
     const id = parseInt(document.getElementById("actionId").value);
@@ -245,8 +268,10 @@ async function saveEditForm(e) {
     const index = actions.findIndex(item => item.id === id);
     if (index !== -1) {
         actions[index] = updatedAction;
+        // 保存到云端和本地
         await saveTrainData(trainData);
-        await renderStage(tab, stage);
+        // 重新渲染时强制从云端获取最新数据
+        await renderStage(tab, stage, true);
         closeEditModal();
     }
 }
@@ -268,6 +293,7 @@ function closeAddModal() {
 // 保存添加动作
 async function saveAddForm(e) {
     e.preventDefault();
+    // 获取当前数据
     const trainData = await getTrainData();
 
     const tab = document.getElementById("addTab").value;
@@ -291,8 +317,10 @@ async function saveAddForm(e) {
 
     // 添加到对应阶段
     trainData[tab][stage].push(newAction);
+    // 保存到云端和本地
     await saveTrainData(trainData);
-    await renderStage(tab, stage);
+    // 重新渲染时强制从云端获取最新数据
+    await renderStage(tab, stage, true);
     closeAddModal();
 }
 
@@ -331,9 +359,10 @@ document.getElementById("addForm").addEventListener("submit", saveAddForm);
 
 // 初始化渲染
 async function init() {
-    await renderTab("push");
-    await renderTab("pull");
-    await renderTab("leg");
+    // 页面初始化时，强制从云端获取最新数据
+    await renderTab("push", true);
+    await renderTab("pull", true);
+    await renderTab("leg", true);
 }
 
 // 页面加载完成后初始化
