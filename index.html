@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>凯圣王三分化训练计划（新手版）</title>
+    <!-- 引入外部CSS样式 -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- 头部 -->
+    <div class="header">凯圣王三分化训练计划（新手友好版）</div>
+
+
+
+    <!-- 标签页导航 -->
+    <div class="tab-nav">
+        <button class="tab-btn active" data-tab="push">推日</button>
+        <button class="tab-btn" data-tab="pull">拉日</button>
+        <button class="tab-btn" data-tab="leg">腿日</button>
+    </div>
+
+    <!-- 内容区域 -->
+    <div class="tab-content active" id="push">
+        <div class="stage-title">
+            热身（10分钟）
+            <button class="add-action-btn" data-tab="push" data-stage="warmup">添加动作</button>
+        </div>
+        <div class="action-list" id="push-warmup"></div>
+
+        <div class="stage-title">
+            正式训练
+            <button class="add-action-btn" data-tab="push" data-stage="formal">添加动作</button>
+        </div>
+        <div class="action-list" id="push-formal"></div>
+
+        <div class="stage-title">
+            放松（5分钟）
+            <button class="add-action-btn" data-tab="push" data-stage="relax">添加动作</button>
+        </div>
+        <div class="action-list" id="push-relax"></div>
+    </div>
+
+    <div class="tab-content" id="pull">
+        <div class="stage-title">
+            热身（10分钟）
+            <button class="add-action-btn" data-tab="pull" data-stage="warmup">添加动作</button>
+        </div>
+        <div class="action-list" id="pull-warmup"></div>
+
+        <div class="stage-title">
+            正式训练
+            <button class="add-action-btn" data-tab="pull" data-stage="formal">添加动作</button>
+        </div>
+        <div class="action-list" id="pull-formal"></div>
+
+        <div class="stage-title">
+            放松（5分钟）
+            <button class="add-action-btn" data-tab="pull" data-stage="relax">添加动作</button>
+        </div>
+        <div class="action-list" id="pull-relax"></div>
+    </div>
+
+    <div class="tab-content" id="leg">
+        <div class="stage-title">
+            热身（10分钟）
+            <button class="add-action-btn" data-tab="leg" data-stage="warmup">添加动作</button>
+        </div>
+        <div class="action-list" id="leg-warmup"></div>
+
+        <div class="stage-title">
+            正式训练
+            <button class="add-action-btn" data-tab="leg" data-stage="formal">添加动作</button>
+        </div>
+        <div class="action-list" id="leg-formal"></div>
+
+        <div class="stage-title">
+            放松（5分钟）
+            <button class="add-action-btn" data-tab="leg" data-stage="relax">添加动作</button>
+        </div>
+        <div class="action-list" id="leg-relax"></div>
+    </div>
+
+    <!-- 编辑弹窗 -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-title">编辑动作信息</div>
+            <form id="editForm">
+                <input type="hidden" id="actionId">
+                <input type="hidden" id="actionTab">
+                <input type="hidden" id="actionStage">
+
+                <div class="form-item">
+                    <label class="form-label" for="actionName">动作名称</label>
+                    <input type="text" class="form-input" id="actionName" required>
+                </div>
+
+                <div class="form-item">
+                    <label class="form-label" for="actionSets">组数×次数</label>
+                    <input type="text" class="form-input" id="actionSets" required>
+                </div>
+
+                <div class="form-item">
+                    <label class="form-label" for="actionWeight">重量参考（女/男）</label>
+                    <input type="text" class="form-input" id="actionWeight" required>
+                </div>
+
+                <div class="form-item">
+                    <label class="form-label" for="actionTips">核心动作要点</label>
+                    <textarea class="form-textarea" id="actionTips" required></textarea>
+                </div>
+
+                <div class="form-item">
+                    <label class="form-label" for="actionRemark">备注（器械需求）</label>
+                    <input type="text" class="form-input" id="actionRemark" required>
+                </div>
+
+                <div class="form-item">
+                    <label class="form-label" for="actionTutorial">抖音教程链接</label>
+                    <input type="url" class="form-input" id="actionTutorial" placeholder="输入抖音视频链接，如https://www.douyin.com/xxx">
+                </div>
+
+                <div class="modal-btn-group">
+                    <button type="button" class="btn cancel-btn" id="cancelBtn">取消</button>
+                    <button type="submit" class="btn save-btn">保存修改</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 添加动作弹窗 -->
+    <div class="modal" id="addModal">
+        <div class="modal-content">
+            <div class="modal-title">添加动作信息</div>
+            <form id="addForm">
+                <input type="hidden" id="addTab">
+                <input type="hidden" id="addStage">
+
+                <div class="form-item">
+                    <label class="form-label" for="addActionName">动作名称</label>
+                    <input type="text" class="form-input" id="addActionName" required>
+                </div>
+
+                <div class="form-item">
+                    <label class="form-label" for="addActionSets">组数×次数</label>
+                    <input type="text" class="form-input" id="addActionSets" required>
+                </div>
+
+                <div class="form-item">
+                    <label class="form-label" for="addActionWeight">重量参考（女/男）</label>
+                    <input type="text" class="form-input" id="addActionWeight" required>
+                </div>
+
+                <div class="form-item">
+                    <label class="form-label" for="addActionTips">核心动作要点</label>
+                    <textarea class="form-textarea" id="addActionTips" required></textarea>
+                </div>
+
+                <div class="form-item">
+                    <label class="form-label" for="addActionRemark">备注（器械需求）</label>
+                    <input type="text" class="form-input" id="addActionRemark" required>
+                </div>
+
+                <div class="form-item">
+                    <label class="form-label" for="addActionTutorial">抖音教程链接</label>
+                    <input type="url" class="form-input" id="addActionTutorial" placeholder="输入抖音视频链接，如https://www.douyin.com/xxx">
+                </div>
+
+                <div class="modal-btn-group">
+                    <button type="button" class="btn cancel-btn" id="addCancelBtn">取消</button>
+                    <button type="submit" class="btn save-btn">添加动作</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 引入外部JavaScript -->
+    <script src="js/script.js"></script>
+</body>
+</html>

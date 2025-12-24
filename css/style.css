@@ -1,0 +1,263 @@
+/* 全局样式重置 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "微软雅黑", "Helvetica Neue", sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+    line-height: 1.6;
+    padding: 10px;
+    font-size: 14px;
+}
+
+/* 头部样式 */
+.header {
+    background-color: #2c3e50;
+    color: white;
+    padding: 15px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+
+
+/* 标签页导航 */
+.tab-nav {
+    display: flex;
+    background-color: white;
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 15px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 12px 0;
+    text-align: center;
+    font-size: 15px;
+    color: #666;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+}
+
+.tab-btn.active {
+    color: #2c3e50;
+    border-bottom: 2px solid #2c3e50;
+    font-weight: bold;
+}
+
+/* 内容容器 */
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* 训练阶段标题 - 颜色区分 */
+.stage-title {
+    margin: 15px 0 10px;
+    padding: 8px 12px;
+    color: white;
+    font-size: 16px;
+    border-radius: 4px;
+}
+
+/* 热身阶段 - 蓝色 */
+.stage-title:nth-of-type(1) {
+    background-color: #3498db;
+}
+
+/* 正式训练阶段 - 深绿色 */
+.stage-title:nth-of-type(3) {
+    background-color: #27ae60;
+}
+
+/* 放松阶段 - 紫色 */
+.stage-title:nth-of-type(5) {
+    background-color: #9b59b6;
+}
+
+/* 动作卡片 */
+.action-card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    border: 1px solid #e0e0e0;
+}
+
+/* 动作名称 */
+.action-name {
+    margin-bottom: 12px;
+}
+
+.action-name .action-value {
+    font-size: 18px;
+    color: #2c3e50;
+    font-weight: bold;
+}
+
+/* 动作信息 */
+.action-item {
+    margin-bottom: 8px;
+}
+
+.action-label {
+    font-weight: bold;
+    color: #333;
+    display: block;
+    margin-bottom: 3px;
+}
+
+.action-value {
+    color: #666;
+}
+
+/* 手机端优化 */
+@media (max-width: 480px) {
+    .action-name .action-value {
+        font-size: 16px;
+    }
+}
+
+/* 按钮组 */
+.btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+}
+
+.edit-btn {
+    background-color: #f39c12;
+    color: white;
+}
+
+.tutorial-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.tutorial-btn.disabled {
+    background-color: #bdc3c7;
+    cursor: not-allowed;
+}
+
+/* 删除按钮 */
+.delete-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+/* 添加动作按钮 */
+.add-action-btn {
+    background-color: #2ecc71;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    float: right;
+}
+
+/* 弹窗样式 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    padding: 15px;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 500px;
+    padding: 20px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #2c3e50;
+}
+
+.form-item {
+    margin-bottom: 15px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+}
+
+.form-input, .form-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #666;
+}
+
+.form-textarea {
+    min-height: 100px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.modal-btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.cancel-btn {
+    background-color: #95a5a6;
+    color: white;
+}
+
+.save-btn {
+    background-color: #27ae60;
+    color: white;
+}
