@@ -68,7 +68,11 @@
      - **数据库**：选择你刚才创建的D1数据库
 4. 点击**保存并部署**按钮
 
-**重要提示**：不要在构建命令中使用 `npx wrangler deploy`，这是用于部署Workers的命令，不是Pages项目。Cloudflare Pages会自动处理构建和部署流程。
+**重要提示**：
+1. 不要在构建命令中使用 `npx wrangler deploy`，这是用于部署Workers的命令，不是Pages项目
+2. Cloudflare Pages项目不需要 `wrangler.toml` 文件，已从项目中移除
+3. 确保在控制台的构建设置中，**构建命令**字段确实留空
+4. Cloudflare Pages会自动处理构建和部署流程
 
 ### 步骤6：等待部署完成
 
