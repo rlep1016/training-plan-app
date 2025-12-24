@@ -243,34 +243,64 @@ function closeEditModal() {
 
 // 保存编辑内容
 async function saveEditForm(e) {
-    e.preventDefault();
-    // 获取当前数据
-    const trainData = await getTrainData();
-
-    const id = parseInt(document.getElementById("actionId").value);
-    const tab = document.getElementById("actionTab").value;
-    const stage = document.getElementById("actionStage").value;
-
-    const updatedAction = {
-        id: id,
-        name: document.getElementById("actionName").value,
-        sets: document.getElementById("actionSets").value,
-        weight: document.getElementById("actionWeight").value,
-        tips: document.getElementById("actionTips").value,
-        remark: document.getElementById("actionRemark").value,
-        tutorial: document.getElementById("actionTutorial").value
-    };
-
-    // 找到并替换原有动作
-    const actions = trainData[tab][stage];
-    const index = actions.findIndex(item => item.id === id);
-    if (index !== -1) {
-        actions[index] = updatedAction;
-        // 保存到云端和本地
-        await saveTrainData(trainData);
-        // 重新渲染时强制从云端获取最新数据
-        await renderStage(tab, stage, true);
-        closeEditModal();
+    try {
+        e.preventDefault();
+        console.log('saveEditForm called');
+        
+        // 获取当前数据
+        console.log('Getting train data...');
+        const trainData = await getTrainData();
+        console.log('Got train data:', trainData);
+        
+        const id = parseInt(document.getElementById("actionId").value);
+        const tab = document.getElementById("actionTab").value;
+        const stage = document.getElementById("actionStage").value;
+        
+        console.log('Editing action:', id, tab, stage);
+        
+        const updatedAction = {
+            id: id,
+            name: document.getElementById("actionName").value,
+            sets: document.getElementById("actionSets").value,
+            weight: document.getElementById("actionWeight").value,
+            tips: document.getElementById("actionTips").value,
+            remark: document.getElementById("actionRemark").value,
+            tutorial: document.getElementById("actionTutorial").value
+        };
+        
+        console.log('Updated action data:', updatedAction);
+        
+        // 找到并替换原有动作
+        console.log('Finding action in data structure...');
+        if (trainData[tab] && trainData[tab][stage]) {
+            const actions = trainData[tab][stage];
+            const index = actions.findIndex(item => item.id === id);
+            
+            if (index !== -1) {
+                console.log('Found action at index:', index);
+                actions[index] = updatedAction;
+                
+                // 保存到云端和本地
+                console.log('Saving updated data...');
+                await saveTrainData(trainData);
+                
+                // 重新渲染时强制从云端获取最新数据
+                console.log('Rendering updated stage...');
+                await renderStage(tab, stage, true);
+                
+                console.log('Closing modal...');
+                closeEditModal();
+                console.log('Save edit completed successfully');
+            } else {
+                console.error('Action not found:', id);
+            }
+        } else {
+            console.error('Invalid tab or stage:', tab, stage);
+            console.error('Train data structure:', trainData);
+        }
+    } catch (error) {
+        console.error('Error in saveEditForm:', error);
+        console.error('Error stack:', error.stack);
     }
 }
 
