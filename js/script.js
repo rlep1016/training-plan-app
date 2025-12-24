@@ -98,23 +98,42 @@ async function getTrainData(forceRefresh = false) {
 
 // 保存数据到 Cloudflare Pages Functions 和本地存储
 async function saveTrainData(data) {
+    console.log('=== 开始保存数据 ===');
+    console.log('要保存的数据:', JSON.stringify(data, null, 2));
+    
     // 首先尝试更新云端数据
     try {
+        console.log('发送PUT请求到:', API_BASE_URL);
         const response = await fetch(API_BASE_URL, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
+            cache: 'no-store' // 禁用缓存
         });
         
+        console.log('收到响应，状态码:', response.status);
+        
+        const responseText = await response.text();
+        console.log('响应内容:', responseText);
+        
         if (response.ok) {
-            // 如果云端更新成功，再更新本地存储
-            localStorage.setItem("trainData", JSON.stringify(data));
-            console.log('数据已成功保存到云端和本地');
+            try {
+                const responseJson = JSON.parse(responseText);
+                console.log('响应JSON:', responseJson);
+                
+                // 如果云端更新成功，再更新本地存储
+                localStorage.setItem("trainData", JSON.stringify(data));
+                console.log('数据已成功保存到云端和本地');
+                console.log(`云端插入了 ${responseJson.insertedCount} 条记录`);
+            } catch (jsonError) {
+                console.error('解析响应JSON失败:', jsonError);
+                localStorage.setItem("trainData", JSON.stringify(data));
+                console.log('数据已保存到本地，但解析云端响应失败');
+            }
         } else {
-            const errorText = await response.text();
-            console.error('保存数据到云端失败:', errorText);
+            console.error('保存数据到云端失败，状态码:', response.status, '响应内容:', responseText);
             // 即使云端失败，也更新本地存储，确保用户体验
             localStorage.setItem("trainData", JSON.stringify(data));
             console.log('数据仅保存到本地');
@@ -124,6 +143,8 @@ async function saveTrainData(data) {
         // 网络失败时，仍然更新本地存储
         localStorage.setItem("trainData", JSON.stringify(data));
     }
+    
+    console.log('=== 保存数据完成 ===');
 }
 
 // 渲染单个动作
