@@ -1,3 +1,0 @@
-name = "training-plan-app"
-main = "functions/api/training-data.js"
-compatibility_date = "2024-01-01"
