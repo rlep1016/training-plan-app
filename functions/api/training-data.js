@@ -8,6 +8,17 @@ export async function onRequestGet(context) {
       `SELECT * FROM training_actions ORDER BY tab, stage, id`
     ).all();
 
+    // 记录原始查询结果
+    console.log('Raw query results:', results.results);
+    console.log('Total actions found:', results.results.length);
+    
+    // 按tab分组统计
+    const tabCount = {};
+    results.results.forEach(action => {
+      tabCount[action.tab] = (tabCount[action.tab] || 0) + 1;
+    });
+    console.log('Actions per tab:', tabCount);
+
     // 转换数据格式为前端期望的结构
     const formattedData = {
       push: { warmup: [], formal: [], relax: [] },
@@ -15,16 +26,26 @@ export async function onRequestGet(context) {
       leg: { warmup: [], formal: [], relax: [] }
     };
 
+    // 遍历并添加到对应数组
     results.results.forEach(action => {
-      formattedData[action.tab][action.stage].push(action);
+      if (formattedData[action.tab] && formattedData[action.tab][action.stage]) {
+        formattedData[action.tab][action.stage].push(action);
+        console.log('Added action:', action.id, action.tab, action.stage, action.name);
+      } else {
+        console.error('Invalid tab or stage:', action.tab, action.stage);
+      }
     });
+    
+    // 记录最终格式化数据
+    console.log('Formatted data:', formattedData);
 
     return new Response(JSON.stringify(formattedData), {
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {
     console.error('Error fetching training data:', error);
-    return new Response(JSON.stringify({ error: 'Failed to fetch training data' }), {
+    console.error('Error stack:', error.stack);
+    return new Response(JSON.stringify({ error: 'Failed to fetch training data', details: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });
