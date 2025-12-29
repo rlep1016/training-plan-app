@@ -183,14 +183,43 @@ function renderAction(action, tab, stage) {
 
 // 渲染指定标签页的指定阶段
 async function renderStage(tab, stage, forceRefresh = false) {
-    const trainData = await getTrainData(forceRefresh);
-    const container = document.getElementById(`${tab}-${stage}`);
-    container.innerHTML = "";
-
-    const actions = trainData[tab][stage];
-    actions.forEach(action => {
-        container.appendChild(renderAction(action, tab, stage));
-    });
+    try {
+        console.log(`Rendering stage: ${tab}-${stage}, forceRefresh: ${forceRefresh}`);
+        
+        const trainData = await getTrainData(forceRefresh);
+        console.log(`Got trainData for ${tab}:`, trainData[tab]);
+        
+        const container = document.getElementById(`${tab}-${stage}`);
+        if (!container) {
+            console.error(`Container not found: ${tab}-${stage}`);
+            return;
+        }
+        
+        container.innerHTML = "";
+        
+        // 确保trainData[tab]和trainData[tab][stage]存在
+        if (!trainData[tab]) {
+            console.error(`No data found for tab: ${tab}`);
+            return;
+        }
+        
+        const actions = trainData[tab][stage] || [];
+        console.log(`Found ${actions.length} actions for ${tab}-${stage}`);
+        
+        // 确保actions是数组
+        if (Array.isArray(actions)) {
+            actions.forEach(action => {
+                container.appendChild(renderAction(action, tab, stage));
+            });
+        } else {
+            console.error(`Actions is not an array for ${tab}-${stage}:`, actions);
+        }
+        
+        console.log(`Rendered ${tab}-${stage} successfully`);
+    } catch (error) {
+        console.error(`Error rendering ${tab}-${stage}:`, error);
+        console.error(`Error stack:`, error.stack);
+    }
 }
 
 // 渲染整个标签页
